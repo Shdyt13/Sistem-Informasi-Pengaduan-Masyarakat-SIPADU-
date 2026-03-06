@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: sipadu_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - sipadu-network
+
+  db:
+    image: mariadb:10.4
+    container_name: sipadu_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pengaduan_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user123
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - sipadu-network
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: sipadu_pma
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - sipadu-network
+
+networks:
+  sipadu-network:
+    driver: bridge
+
+volumes:
+  db_data:
